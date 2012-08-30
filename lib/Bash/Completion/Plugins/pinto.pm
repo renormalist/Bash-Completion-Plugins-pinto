@@ -51,65 +51,79 @@ sub complete {
 
     my $word = $r->word;
 
-    if($word =~ /^-/) {
-        $r->candidates(grep { /^\Q$word\E/ } @pinto_options);
+    if ($word =~ /^-/) {
+            $r->candidates(grep { /^\Q$word\E/ } @pinto_options);
     } else {
-        my @args = $r->args;
-        shift @args; # get rid of 'pinto'
-        shift @args until @args == 0 || $args[0] !~ /^-/;
+            my @args = $r->args;
 
-        my $command = $args[0] // '';
+            my @orig_args = @args;
 
-        my @options = ();
-        given($command) {
-                when ("add")        { @options = qw(--author --dryrun --norecurse --pin --stack); }
-                when ("copy")       { @options = qw(--description --dryrun); }
-                when ("edit")       { @options = qw(--default --dryrun --properties -P); }
-                when ("init")      { @options = qw(--source); }
-                when ("install")       { @options = qw(--cpanm-exe --cpanm
-                                                    --cpanm-options -o
-                                                    -l --local-lib --local-lib-contained
-                                                    --pull
-                                                    --stack
-                                                  ); }
-                when ("list")       { @options = qw(--author -A
-                                                    --distributions -D
-                                                    --format
-                                                    --packages -P
-                                                    --pinned
-                                                    --stack -s
-                                                  ); }
-                when ("merge")      { @options = qw(--dryrun); }
-                when ("new")        { @options = qw(--dryrun --description); }
-                when ("nop")        { @options = qw(--sleep); }
-                when ("pin")        { @options = qw(--dryrun --stack); }
-                when ("props")      { @options = qw(--format); }
-                when ("pull")       { @options = qw(--dryrun --norecurse --stack); }
-                when ("stacks")     { @options = qw(--format); }
-                when ("unpin")      { @options = qw(--dryrun --stack); }
-                default { };
-        }
+            shift @args; # get rid of 'pinto'
 
-        given($command) {
-            when($command eq $word) {
-                $r->candidates(grep { /^\Q$word\E/ }
-                    ( @pinto_commands, @pinto_options ));
+            # get rid of (-rFOO|-r FOO|--root FOO|--root=FOO)
+            if ($args[0] =~ qr/^(?:-r|--root)$/) {
+                    if ($args[0] =~ qr/^(?:--root=)$/) {
+                            shift @args;
+                    } elsif ($args[1]) {
+                            shift @args;
+                            shift @args;
+                    }
             }
-            ##_get_stacks() is quite slow for my demanding taste (due to slow pinto startup time)
-            when(qr/^(?:copy|delete|index|list|merge|pin|unpin)$/) {
-                my ( $current_stack, @stacks ) = _get_stacks();
-                $r->candidates(grep { /^\Q$word\E/ } ( @options, @stacks ));
+
+            shift @args until @args == 0 || $args[0] !~ /^-/;
+
+            my $command = $args[0] // '';
+
+            my @options = ();
+            given($command) {
+                    when ("add")        { @options = qw(--author --dryrun --norecurse --pin --stack); }
+                    when ("copy")       { @options = qw(--description --dryrun); }
+                    when ("edit")       { @options = qw(--default --dryrun --properties -P); }
+                    when ("init")       { @options = qw(--source); }
+                    when ("install")    { @options = qw(--cpanm-exe --cpanm
+                                                        --cpanm-options -o
+                                                        -l --local-lib --local-lib-contained
+                                                        --pull
+                                                        --stack
+                                                      ); }
+                    when ("list")       { @options = qw(--author -A
+                                                        --distributions -D
+                                                        --format
+                                                        --packages -P
+                                                        --pinned
+                                                        --stack -s
+                                                      ); }
+                    when ("merge")      { @options = qw(--dryrun); }
+                    when ("new")        { @options = qw(--dryrun --description); }
+                    when ("nop")        { @options = qw(--sleep); }
+                    when ("pin")        { @options = qw(--dryrun --stack); }
+                    when ("props")      { @options = qw(--format); }
+                    when ("pull")       { @options = qw(--dryrun --norecurse --stack); }
+                    when ("stacks")     { @options = qw(--format); }
+                    when ("unpin")      { @options = qw(--dryrun --stack); }
+                    default { };
             }
-            when(qr/^(?:manual|help)$/) {
-                $r->candidates(grep { /^\Q$word\E/ }
-                    ( @pinto_commands ));
+
+            given($command) {
+                    when($command eq $word) {
+                            $r->candidates(grep { /^\Q$word\E/ }
+                                           ( @pinto_commands, @pinto_options ));
+                    }
+                    ##_get_stacks() is quite slow for my demanding taste (due to slow pinto startup time)
+                    when(qr/^(?:copy|delete|index|list|merge|pin|unpin)$/) {
+                            my ( $current_stack, @stacks ) = _get_stacks();
+                            $r->candidates(grep { /^\Q$word\E/ } ( @options, @stacks ));
+                    }
+                    when(qr/^(?:manual|help)$/) {
+                            $r->candidates(grep { /^\Q$word\E/ }
+                                           ( @pinto_commands ));
+                    }
+                    default {
+                            # all other commands (including unrecognized ones) get
+                            # no completions
+                            $r->candidates(grep { /^\Q$word\E/ } ( @options ));
+                    }
             }
-            default {
-                # all other commands (including unrecognized ones) get
-                # no completions
-                $r->candidates(grep { /^\Q$word\E/ } ( @options ));
-            }
-        }
     }
 }
 
