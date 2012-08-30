@@ -95,12 +95,11 @@ sub complete {
                 $r->candidates(grep { /^\Q$word\E/ }
                     ( @pinto_commands, @pinto_options ));
             }
-            # _get_stacks() too slow for my demanding taste (due to slow pinto startup time)
-            #
-            # when(qr/^(?:copy|delete|index|list|merge|pin|unpin)$/) {
-            #     my ( $current_stack, @stacks ) = _get_stacks();
-            #     $r->candidates(grep { /^\Q$word\E/ } ( @options, @stacks ));
-            # }
+            ##_get_stacks() is quite slow for my demanding taste (due to slow pinto startup time)
+            when(qr/^(?:copy|delete|index|list|merge|pin|unpin)$/) {
+                my ( $current_stack, @stacks ) = _get_stacks();
+                $r->candidates(grep { /^\Q$word\E/ } ( @options, @stacks ));
+            }
             when(qr/^(?:manual|help)$/) {
                 $r->candidates(grep { /^\Q$word\E/ }
                     ( @pinto_commands ));
