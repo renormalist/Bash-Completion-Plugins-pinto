@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.002     2012-08-30
         - work with leading --root params
 
 0.001     2012-08-30
