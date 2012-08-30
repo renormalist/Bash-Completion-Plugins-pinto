@@ -1,0 +1,4 @@
+.*
+!.gitignore
+Bash-Completion-Plugins-pinto-*
+Debian_CPANTS.txt

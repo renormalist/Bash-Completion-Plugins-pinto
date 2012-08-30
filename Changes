@@ -1,0 +1,5 @@
+Revision history for {{$dist->name}}
+
+{{$NEXT}}
+        - bash completion for Pinto
+        - derived from Bash::Completion::Plugins::perlbrew by Rob Hoelz
