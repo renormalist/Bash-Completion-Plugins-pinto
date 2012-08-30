@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+        - work with leading --root params
 
 0.001     2012-08-30
         - bash completion for Pinto
