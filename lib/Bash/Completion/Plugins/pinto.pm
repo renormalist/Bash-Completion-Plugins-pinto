@@ -61,7 +61,7 @@ sub complete {
             shift @args; # get rid of 'pinto'
 
             # get rid of (-rFOO|-r FOO|--root FOO|--root=FOO)
-            if ($args[0] =~ qr/^(?:-r|--root)$/) {
+            if ($args[0] and $args[0] =~ qr/^(?:-r|--root)$/) {
                     if ($args[0] =~ qr/^(?:--root=)$/) {
                             shift @args;
                     } elsif ($args[1]) {
