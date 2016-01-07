@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+        - replace given/when with for/do [Mark Gardner]
 
 0.003     2012-09-04
         - fix "uninitialized value" warning
